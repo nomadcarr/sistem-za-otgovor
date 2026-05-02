@@ -4,13 +4,13 @@ APScheduler задачи:
      записва съобщенията в pending_outbound (n8n ги взима и изпраща).
   2. Всеки ден в DAILY_REPORT_TIME — генерира PDF и го праща на имейл.
 """
+import pytz
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from config import settings
 
-_tz = settings.timezone if settings.timezone else "Europe/Sofia"
-_scheduler = AsyncIOScheduler(timezone=_tz)
+_scheduler = AsyncIOScheduler(timezone=pytz.timezone("Europe/Sofia"))
 
 
 # ─── Проверка за неактивни разговори ─────────────────────────────────────────
