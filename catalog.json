@@ -1,0 +1,37 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Продукт А",
+      "description": "Описание на продукт А. Висококачествен продукт, подходящ за всекидневна употреба.",
+      "price": 29.99,
+      "currency": "лв.",
+      "available": true,
+      "variants": ["Червен", "Син", "Черен"]
+    },
+    {
+      "id": 2,
+      "name": "Продукт Б",
+      "description": "Описание на продукт Б. Издръжлив материал, дълъг живот.",
+      "price": 49.99,
+      "currency": "лв.",
+      "available": true,
+      "variants": []
+    },
+    {
+      "id": 3,
+      "name": "Продукт В",
+      "description": "Описание на продукт В. Комплект от 2 броя.",
+      "price": 79.99,
+      "currency": "лв.",
+      "available": false,
+      "variants": []
+    }
+  ],
+  "shipping": {
+    "econt_office": 5.99,
+    "home_address": 7.99,
+    "free_over": 100.00
+  },
+  "notes": "Замени тези продукти с реалния ти каталог. Полетата са: id, name, description, price, currency, available, variants."
+}
