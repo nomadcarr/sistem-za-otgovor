@@ -1,11 +1,4 @@
-"""
-Входна точка — опростена за n8n архитектура.
-n8n се свързва с Facebook/Email и извиква нашите endpoint-и.
-Ние обработваме AI логиката, поръчките и репортите.
-
-Стартиране:
-    .venv\Scripts\python.exe -m uvicorn main:app --host 0.0.0.0 --port 8000
-"""
+# Входна точка — опростена за n8n архитектура.
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from database import init_db

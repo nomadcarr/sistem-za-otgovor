@@ -9,7 +9,8 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from config import settings
 
-_scheduler = AsyncIOScheduler(timezone=settings.timezone)
+_tz = settings.timezone if settings.timezone else "Europe/Sofia"
+_scheduler = AsyncIOScheduler(timezone=_tz)
 
 
 # ─── Проверка за неактивни разговори ─────────────────────────────────────────
@@ -46,10 +47,6 @@ async def _check_inactivity():
 async def _send_daily_report():
     from report_generator import generate_report_pdf
     from database import get_todays_orders, get_todays_declined
-    import aiosmtplib
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-    from email.mime.application import MIMEApplication
     from datetime import datetime
 
     orders = get_todays_orders()
@@ -57,26 +54,28 @@ async def _send_daily_report():
     today_str = datetime.now().strftime("%d.%m.%Y")
 
     pdf_bytes = generate_report_pdf(orders, declined, today_str)
+    print(f"[Scheduler] Репорт генериран за {today_str} — поръчки: {len(orders)}, отказани: {len(declined)}")
+
+    if not settings.email_address or not settings.report_recipient_email:
+        print("[Scheduler] Имейл не е настроен — репортът не е изпратен.")
+        return
+
+    import aiosmtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from email.mime.application import MIMEApplication
 
     mail = MIMEMultipart()
     mail["From"] = settings.email_address
     mail["To"] = settings.report_recipient_email
     mail["Subject"] = f"Дневен репорт — {today_str}"
-
-    body_text = (
-        f"Здравейте,\n\nПрилагам дневния репорт за {today_str}.\n\n"
-        f"Потвърдени поръчки: {len(orders)}\n"
-        f"Отказани поръчки: {len(declined)}\n\n"
-        f"С уважение,\nАвтоматична система"
-    )
-    mail.attach(MIMEText(body_text, "plain", "utf-8"))
-
+    mail.attach(MIMEText(
+        f"Потвърдени поръчки: {len(orders)}\nОтказани поръчки: {len(declined)}",
+        "plain", "utf-8"
+    ))
     attachment = MIMEApplication(pdf_bytes, _subtype="pdf")
-    attachment.add_header(
-        "Content-Disposition",
-        "attachment",
-        filename=f"report_{today_str.replace('.', '-')}.pdf",
-    )
+    attachment.add_header("Content-Disposition", "attachment",
+                          filename=f"report_{today_str.replace('.', '-')}.pdf")
     mail.attach(attachment)
 
     try:
@@ -88,9 +87,9 @@ async def _send_daily_report():
             password=settings.email_password,
             start_tls=True,
         )
-        print(f"[Scheduler] Дневен репорт изпратен за {today_str}")
+        print(f"[Scheduler] Репорт изпратен на {settings.report_recipient_email}")
     except Exception as e:
-        print(f"[Scheduler] Грешка при изпращане на репорт: {e}")
+        print(f"[Scheduler] Грешка при изпращане: {e}")
 
 
 # ─── Стартиране ───────────────────────────────────────────────────────────────
