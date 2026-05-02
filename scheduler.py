@@ -95,7 +95,8 @@ async def _send_daily_report():
 # ─── Стартиране ───────────────────────────────────────────────────────────────
 
 def start_scheduler():
-    hour, minute = settings.daily_report_time.split(":")
+    report_time = settings.daily_report_time if ":" in (settings.daily_report_time or "") else "23:30"
+    hour, minute = report_time.split(":")
 
     _scheduler.add_job(
         _check_inactivity,
