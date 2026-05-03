@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from database import init_db
 from scheduler import start_scheduler
 from internal_api import router as internal_router
+from chatrace_handler import router as chatrace_router
 
 
 @asynccontextmanager
@@ -24,6 +25,7 @@ app = FastAPI(
 )
 
 app.include_router(internal_router, prefix="/internal", tags=["Internal"])
+app.include_router(chatrace_router, prefix="/chatrace", tags=["Chatrace"])
 
 
 @app.get("/health")
